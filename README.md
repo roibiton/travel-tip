@@ -7,8 +7,12 @@ TravelTip is an app that keeps a list of favorite locations
 
 ## Main Features
 - The app allows the user to keep and manage locations
-- The user can also search for an address and pan the map to that point
-- The User can pan the map to his own geo-location
+- The user can edit rates and remove locations
+- The user can sort his locations by rate, name and creation date
+- The user can also search for a location name or its address and pan the map to that point
+- The user can pan the map to his own geo-location
+- The user can see the distance between his saved locations and his own geo-location
+- The user can check the statistic graphs of locations by rate and by last update
 
 ## Locations CRUDL 
 - Create – click on the map prompts for name and rate
