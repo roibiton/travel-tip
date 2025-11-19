@@ -57,8 +57,8 @@ function renderLocs(locs) {
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
                 <span>${loc.name}</span>
-                <span>${(gUserPos?.lat === loc.geo.lat && gUserPos?.lng === loc.geo.lng) ? ' (You)' : (gUserPos ? utilService.getDistance(gUserPos, loc.geo, 'km') + ' km' : '')}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
+                <h5>${(gUserPos?.lat === loc.geo.lat && gUserPos?.lng === loc.geo.lng) ? ' (You)' : (gUserPos ? utilService.getDistance(gUserPos, loc.geo, 'km') + ' km' : '')}</h5>
             </h4>
             <p class="muted">
                 Created: ${utilService.elapsedTime(loc.createdAt)}
