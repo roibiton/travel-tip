@@ -1,47 +1,68 @@
+* { box-sizing: border-box; }
+
 body {
     background-color: var(--bg1);
-    color: #eee;
-    overflow-x: hidden;
+    color: var(--color1);
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
 }
 
 header {
-    background-color: var(--bg2);
-    color: aliceblue;
-    padding: 0.3em;
+    background: linear-gradient(135deg, var(--bg2), var(--bg3));
+    padding: 0.75rem 1rem;
+    box-shadow: var(--shadow-lg);
+    
+    & h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--color2), var(--color3));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
 }
 
-header h1 {
-    margin: 0;
-}
-
-input[type=text],input[type=number] {
-    line-height: 2em;
-    background-color: var(--color1);
-    border: 0;
+input[type=text], input[type=number] {
+    background-color: var(--bg3);
+    color: var(--color1);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    transition: all 0.3s;
+    
+    &:focus {
+        outline: none;
+        border-color: var(--color2);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
 }
 
 button {
-    color: whitesmoke;
+    color: var(--color1);
     border: 0;
-    border-radius: .2em;
-    background-color: #222;
-    padding: 6px 10px;
-    margin: 2px;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--bg3), var(--bg2));
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
     cursor: pointer;
-    transition: background-color .5s;
+    transition: all 0.3s;
+    box-shadow: var(--shadow);
+    
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        background: linear-gradient(135deg, var(--color2), var(--bg3));
+    }
+    
+    &:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-sm);
+    }
 }
 
-button:hover {
-    color: var(--color2);
-    background-color: #111;
-}
-
-.muted {
-    font-size: .9em;
-    color: var(--gray1);
-}
-
-.smaller {
-    font-size: .8em;
-}
+h2, h3, h4 { font-weight: 600; }
+.muted { font-size: 0.875rem; color: var(--gray1); }
+.smaller { font-size: 0.8rem; }
 

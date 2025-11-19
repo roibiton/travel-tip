@@ -21,12 +21,11 @@
             <button onclick="app.onShareLoc()">Share location</button>
             <input name="loc-copier" />
         </section>
-        <form class="form-search" onsubmit="app.onSearchAddress(event)">
+        <!-- <form class="form-search" onsubmit="app.onSearchAddress(event)">
             <input type="text" name="address" placeholder="Search address" />
             <button title="Search">🔍</button>
-            <button type="button" title="My Position" onclick="app.onPanToUserPos()" 
-            class="btn-user-pos">&nbsp;</button>
-        </form>
+        </form> -->
+            <button type="button" title="My Position" onclick="app.onPanToUserPos()" class="btn-user-pos">&nbsp;</button>
         <button type="button" title="Color theme" onclick="app.onChangeColorTheme()">
             <i class="fa-solid fa-palette"></i>
         </button>
@@ -117,6 +116,9 @@
             </form>
         </dialog>
     </main>
+    <footer>
+        <p>&copy; 2025 TravelTip | Explore the World 🌍</p>
+    </footer>
     <pre class="debug" hidden></pre>
     <div class="user-msg"></div>
     <script type="module" src="js/app.controller.js"></script>

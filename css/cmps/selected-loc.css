@@ -1,23 +1,25 @@
 .selected-loc {
-    background-color: var(--bg3);
-    color: whitesmoke;
-    max-height: 0em;
-    height: 0;
+    background: linear-gradient(135deg, var(--bg3), var(--bg2));
+    max-height: 0;
     overflow: hidden;
-    transition: .5s;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    margin-bottom: 1rem;
+    
+    &.show { max-height: 20rem; padding: 1.5rem; }
+    
+    & h2 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+    & h4 { margin: 0 0 1rem; color: var(--gray1); font-weight: 400; }
+    
+    & button {
+        margin-right: 0.5rem;
+        background: linear-gradient(135deg, var(--color2), #2563eb);
+        &:hover { background: linear-gradient(135deg, #2563eb, var(--color2)); }
+    }
+    
+    & input[name=loc-copier] { opacity: 0; position: absolute; pointer-events: none; }
 }
 
-.selected-loc.show {
-    height: auto;
-    max-height: 15em;
-    padding: 0.5em;
-}
-
-.selected-loc input[name=loc-copier] {
-    opacity: 0;
-}
-
-.loc-rate {
-    color: var(--color4);
-}
+.loc-rate { color: var(--color3); font-weight: 600; }
+.loc-name { color: var(--color2); font-weight: 600; }
