@@ -15,6 +15,7 @@ import { storageService } from './async-storage.service.js'
 //     updatedAt: 1706562160181
 // }
 
+
 const PAGE_SIZE = 5
 const DB_KEY = 'locs'
 var gSortBy = { rate: -1 }
