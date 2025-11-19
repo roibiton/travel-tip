@@ -16,13 +16,18 @@ window.app = {
     onSetFilterBy,
     onSaveLoc,
     onCloseModal,
+    onChangeColorTheme,
+    saveColorTheme
+
 }
 var gUserPos
 var gGeoData
+var gBgColors
 
 function onInit() {
     getFilterByFromQueryParams()
     loadAndRenderLocs()
+    setInputColors()
     mapService.initMap()
         .then(() => {
             mapService.addClickListener(geo => {
@@ -196,8 +201,8 @@ function onSaveLoc(ev) {
         })
 }
 
-function onCloseModal() {
-    const elModal = document.querySelector('.loc-modal')
+function onCloseModal(selector) {
+    const elModal = document.querySelector(`.${selector}`)
     elModal.close()
 }
 
@@ -337,4 +342,57 @@ function cleanStats(stats) {
         return acc
     }, [])
     return cleanedStats
+}
+
+function onChangeColorTheme() {
+
+    const elModal = document.querySelector('.color-modal')
+    elModal.showModal()
+}
+
+function saveColorTheme(ev) {
+    const elModal = document.querySelector('.color-modal')
+    ev.preventDefault()
+    const root = document.documentElement
+    const color1 = document.querySelector('[name="color1"]').value
+    const color2 = document.querySelector('[name="color2"]').value
+    const color3 = document.querySelector('[name="color3"]').value
+
+    root.style.setProperty('--bg1', color1)
+    root.style.setProperty('--bg2', color2)
+    root.style.setProperty('--bg3', color3)
+
+    gBgColors = {
+        color1,
+        color2,
+        color3
+    }
+    setInputColors()    
+    elModal.close()
+}
+
+function setInputColors(){
+    const colorInp1 = document.querySelector('[name="color1"]')
+    const colorInp2 = document.querySelector('[name="color2"]')
+    const colorInp3 = document.querySelector('[name="color3"]')
+
+    if (!gBgColors){
+        console.log('hi');
+        
+        const root = document.documentElement
+        const rootStyles = getComputedStyle(root)
+        const color1 = rootStyles.getPropertyValue('--bg1').trim()
+        const color2 = rootStyles.getPropertyValue('--bg2').trim()
+        const color3 = rootStyles.getPropertyValue('--bg3').trim()
+        console.log(color1, color2, color3);
+        
+        colorInp1.value = color1
+        colorInp2.value = color2
+        colorInp3.value = color3
+
+    }else{
+        colorInp1.value = gBgColors.color1
+        colorInp2.value = gBgColors.color2
+        colorInp3.value = gBgColors.color3
+    }
 }

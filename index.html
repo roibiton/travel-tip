@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://kit.fontawesome.com/3840c4ba5c.js" crossorigin="anonymous"></script>
+
     <link rel="stylesheet" href="css/main.css">
     <title>TravelTip</title>
 </head>
@@ -21,9 +24,12 @@
         <form class="form-search" onsubmit="app.onSearchAddress(event)">
             <input type="text" name="address" placeholder="Search address" />
             <button title="Search">🔍</button>
-            <button type="button" title="My Position" onclick="app.onPanToUserPos()" class="btn-user-pos">&nbsp;
-            </button>
+            <button type="button" title="My Position" onclick="app.onPanToUserPos()" 
+            class="btn-user-pos">&nbsp;</button>
         </form>
+        <button type="button" title="Color theme" onclick="app.onChangeColorTheme()">
+            <i class="fa-solid fa-palette"></i>
+        </button>
     </header>
     <main>
         <div class="map"></div>
@@ -72,7 +78,7 @@
                 </section>
             </section>
         </div>
-        <dialog class="loc-modal">
+        <dialog class="modal loc-modal">
             <form class="loc-form" method="dialog" onsubmit="app.onSaveLoc(event)">
                 <h3 class="modal-title">Add Location</h3>
                 <label>
@@ -85,7 +91,28 @@
                 </label>
                 <div class="form-actions">
                     <button type="submit">Save</button>
-                    <button type="button" onclick="app.onCloseModal()">Cancel</button>
+                    <button type="button" onclick="app.onCloseModal('loc-modal')">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+        <dialog class="modal color-modal">
+            <form class="color-form" method="dialog" onsubmit="app.saveColorTheme(event)">
+                <h3 class="modal-title">Change site's color theme</h3>
+                <label>
+                    Color 1:
+                    <input name="color1" type="color"/>
+                </label>
+                <label>
+                    Color 2:
+                    <input name="color2" type="color"/>
+                </label>
+                <label>
+                    Color 3:
+                    <input name="color3" type="color"/>
+                </label>
+                <div class="form-actions">
+                    <button type="submit">Save</button>
+                    <button type="button" onclick="app.onCloseModal('color-modal')">Cancel</button>
                 </div>
             </form>
         </dialog>
