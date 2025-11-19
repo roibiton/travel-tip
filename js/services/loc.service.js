@@ -111,9 +111,7 @@ function getLocCountByUpdate() {
                 else map.past++
                 return map
             }, { today: 0, past: 0, never: 0 })
-            locCountByUpdateMap.total = locs.length
-            console.log(locCountByUpdateMap);
-            
+            locCountByUpdateMap.total = locs.length  
             return locCountByUpdateMap
         })
 }

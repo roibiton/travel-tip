@@ -1,5 +1,5 @@
 /* Dialog Modal Styles */
-.loc-modal {
+.modal {
     border: none;
     border-radius: 8px;
     padding: 0;
@@ -9,7 +9,7 @@
     &::backdrop {
         background-color: rgba(0, 0, 0, 0.5);
     }
-    & .loc-form {
+    & form {
         padding: 20px;
         display: flex;
         flex-direction: column;
@@ -53,6 +53,12 @@
         cursor: pointer;
         font-size: 1rem;
         transition: background-color 0.2s;
+    }
+}
+
+.color-form{
+    & input{
+        padding: 0;
     }
 }
 
