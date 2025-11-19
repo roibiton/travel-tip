@@ -17,6 +17,7 @@ window.app = {
     onSetSortBy,
     onSetFilterBy,
 }
+var gUserPos
 
 function onInit() {
     getFilterByFromQueryParams()
@@ -30,6 +31,16 @@ function onInit() {
             console.error('OOPs:', err)
             flashMsg('Cannot init map')
         })
+    
+    // Get user position on init
+    mapService.getUserPosition()
+        .then(latLng => {
+            gUserPos = latLng
+            loadAndRenderLocs()
+        })
+        .catch(err => {
+            console.log('User position not available:', err)
+        })
 }
 
 function renderLocs(locs) {
@@ -41,6 +52,7 @@ function renderLocs(locs) {
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
                 <span>${loc.name}</span>
+                <span>${(gUserPos?.lat === loc.geo.lat && gUserPos?.lng === loc.geo.lng) ? ' (You)' : (gUserPos ? utilService.getDistance(gUserPos, loc.geo, 'km') + ' km' : '')}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
             </h4>
             <p class="muted">
@@ -128,6 +140,7 @@ function loadAndRenderLocs() {
 function onPanToUserPos() {
     mapService.getUserPosition()
         .then(latLng => {
+            gUserPos = latLng
             mapService.panTo({ ...latLng, zoom: 15 })
             unDisplayLoc()
             loadAndRenderLocs()
