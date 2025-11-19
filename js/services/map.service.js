@@ -1,4 +1,3 @@
-
 export const mapService = {
     initMap,
     getUserPosition,
@@ -8,7 +7,6 @@ export const mapService = {
     addClickListener
 }
 
-// TODO: Enter your API Key
 const API_KEY = 'AIzaSyDbmrN6mS04IjB3_nUSwpdLmYQSZlw3ZpQ'
 var gMap
 var gMarker
@@ -42,27 +40,34 @@ function lookupAddressGeo(geoOrAddress) {
     return fetch(url)
         .then(res => res.json())
         .then(res => {
-            // console.log('RES IS', res)
-            if (!res.results.length) return new Error('Found nothing')
+            if (!res.results.length) throw new Error('Found nothing')
             res = res.results[0]
             const {formatted_address, geometry} = res
 
             const geo = {
                 address: formatted_address.substring(formatted_address.indexOf(' ')).trim(),
-                lat: geometry.location.lat,
-                lng: geometry.location.lng,
+                lat: geometry.location.lat(),
+                lng: geometry.location.lng(),
                 zoom: gMap.getZoom()
             }
-            // console.log('GEO IS', geo)
             return geo
         })
-
 }
 
 function addClickListener(cb) {
     gMap.addListener('click', (mapsMouseEvent) => {
         const geo = { lat: mapsMouseEvent.latLng.lat(), lng: mapsMouseEvent.latLng.lng() }
-        lookupAddressGeo(geo).then(cb)
+        lookupAddressGeo(geo)
+            .then(cb)
+            .catch(err => {
+                const fallbackGeo = {
+                    lat: geo.lat,
+                    lng: geo.lng,
+                    address: `Location at ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)}`,
+                    zoom: gMap.getZoom()
+                }
+                cb(fallbackGeo)
+            })
     })
 }
 
@@ -76,7 +81,6 @@ function setMarker(loc) {
     })
 }
 
-// This function provides a Promise API to the callback-based-api of getCurrentPosition
 function getUserPosition() {
     return new Promise((resolve, reject) => {
         function onSuccess(res) {

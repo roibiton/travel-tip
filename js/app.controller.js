@@ -4,8 +4,6 @@ import { mapService } from './services/map.service.js'
 
 window.onload = onInit
 
-// To make things easier in this project structure 
-// functions that are called from DOM are defined on a global app object
 window.app = {
     onRemoveLoc,
     onUpdateLoc,
@@ -16,23 +14,25 @@ window.app = {
     onShareLoc,
     onSetSortBy,
     onSetFilterBy,
+    onSaveLoc,
+    onCloseModal,
 }
 var gUserPos
+var gGeoData
 
 function onInit() {
     getFilterByFromQueryParams()
     loadAndRenderLocs()
     mapService.initMap()
         .then(() => {
-            // onPanToTokyo()
-            mapService.addClickListener(onAddLoc)
+            mapService.addClickListener(geo => {
+                onAddLoc(geo)
+            })
         })
         .catch(err => {
             console.error('OOPs:', err)
             flashMsg('Cannot init map')
         })
-    
-    // Get user position on init
     mapService.getUserPosition()
         .then(latLng => {
             gUserPos = latLng
@@ -75,7 +75,9 @@ function renderLocs(locs) {
 
     if (selectedLocId) {
         const selectedLoc = locs.find(loc => loc.id === selectedLocId)
-        displayLoc(selectedLoc)
+        if (selectedLoc) {
+            displayLoc(selectedLoc)
+        }
     }
     document.querySelector('.debug').innerText = JSON.stringify(locs, null, 2)
 }
@@ -108,24 +110,16 @@ function onSearchAddress(ev) {
 }
 
 function onAddLoc(geo) {
-    const locName = prompt('Loc name', geo.address || 'Just a place')
-    if (!locName) return
-
-    const loc = {
-        name: locName,
-        rate: +prompt(`Rate (1-5)`, '3'),
-        geo
-    }
-    locService.save(loc)
-        .then((savedLoc) => {
-            flashMsg(`Added Location (id: ${savedLoc.id})`)
-            utilService.updateQueryParams({ locId: savedLoc.id })
-            loadAndRenderLocs()
-        })
-        .catch(err => {
-            console.error('OOPs:', err)
-            flashMsg('Cannot add location')
-        })
+    const elModal = document.querySelector('.loc-modal')
+    const elForm = elModal.querySelector('.loc-form')
+    const elTitle = elModal.querySelector('.modal-title')
+    elForm.reset()
+    elTitle.innerText = 'Add Location'
+    const elNameInput = elForm.querySelector('[name="name"]')
+    elNameInput.value = geo.address || 'Just a place'
+    gGeoData = geo
+    delete elModal.dataset.locId
+    elModal.showModal()
 }
 
 function loadAndRenderLocs() {
@@ -155,21 +149,56 @@ function onPanToUserPos() {
 function onUpdateLoc(locId) {
     locService.getById(locId)
         .then(loc => {
-            const rate = +prompt('New rate?', loc.rate)
-            if (rate && rate !== loc.rate) {
-                loc.rate = rate
-                locService.save(loc)
-                    .then(savedLoc => {
-                        flashMsg(`Rate was set to: ${savedLoc.rate}`)
-                        loadAndRenderLocs()
-                    })
-                    .catch(err => {
-                        console.error('OOPs:', err)
-                        flashMsg('Cannot update location')
-                    })
-
-            }
+            const elModal = document.querySelector('.loc-modal')
+            const elForm = elModal.querySelector('.loc-form')
+            const elTitle = elModal.querySelector('.modal-title')
+            elTitle.innerText = 'Update Location'
+            elForm.querySelector('[name="name"]').value = loc.name
+            elForm.querySelector('[name="rate"]').value = loc.rate
+            elModal.dataset.locId = loc.id
+            gGeoData = loc.geo
+            elModal.showModal()
         })
+        .catch(err => {
+            console.error('OOPs:', err)
+            flashMsg('Cannot load location for editing')
+        })
+}
+
+function onSaveLoc(ev) {
+    ev.preventDefault()
+    const elModal = document.querySelector('.loc-modal')
+    const elForm = elModal.querySelector('.loc-form')
+    const formData = new FormData(elForm)
+    const name = formData.get('name')
+    const rate = +formData.get('rate')
+    const geo = gGeoData
+    const locId = elModal.dataset.locId
+    const loc = {
+        name,
+        rate,
+        geo
+    }
+    if (locId) {
+        loc.id = locId
+    }
+    locService.save(loc)
+        .then((savedLoc) => {
+            const action = locId ? 'updated' : 'added'
+            flashMsg(`Location ${action} successfully`)
+            utilService.updateQueryParams({ locId: savedLoc.id })
+            loadAndRenderLocs()
+            elModal.close()
+        })
+        .catch(err => {
+            console.error('OOPs:', err)
+            flashMsg('Cannot save location')
+        })
+}
+
+function onCloseModal() {
+    const elModal = document.querySelector('.loc-modal')
+    elModal.close()
 }
 
 function onSelectLoc(locId) {
@@ -184,17 +213,14 @@ function onSelectLoc(locId) {
 function displayLoc(loc) {
     document.querySelector('.loc.active')?.classList?.remove('active')
     document.querySelector(`.loc[data-id="${loc.id}"]`).classList.add('active')
-
     mapService.panTo(loc.geo)
     mapService.setMarker(loc)
-
     const el = document.querySelector('.selected-loc')
     el.querySelector('.loc-name').innerText = loc.name
     el.querySelector('.loc-address').innerText = loc.geo.address
     el.querySelector('.loc-rate').innerHTML = '★'.repeat(loc.rate)
     el.querySelector('[name=loc-copier]').value = window.location
     el.classList.add('show')
-
     utilService.updateQueryParams({ locId: loc.id })
 }
 
@@ -207,15 +233,13 @@ function unDisplayLoc() {
 function onCopyLoc() {
     const elCopy = document.querySelector('[name=loc-copier]')
     elCopy.select()
-    elCopy.setSelectionRange(0, 99999) // For mobile devices
+    elCopy.setSelectionRange(0, 99999)
     navigator.clipboard.writeText(elCopy.value)
     flashMsg('Link copied, ready to paste')
 }
 
 function onShareLoc() {
     const url = document.querySelector('[name=loc-copier]').value
-
-    // title and text not respected by any app (e.g. whatsapp)
     const data = {
         title: 'Cool location',
         text: 'Check out this location',
@@ -238,7 +262,6 @@ function getFilterByFromQueryParams() {
     const txt = queryParams.get('txt') || ''
     const minRate = queryParams.get('minRate') || 0
     locService.setFilterBy({txt, minRate})
-
     document.querySelector('input[name="filter-by-txt"]').value = txt
     document.querySelector('input[name="filter-by-rate"]').value = minRate
 }
@@ -252,17 +275,9 @@ function getLocIdFromQueryParams() {
 function onSetSortBy() {
     const prop = document.querySelector('.sort-by').value
     const isDesc = document.querySelector('.sort-desc').checked
-
     if (!prop) return
-
     const sortBy = {}
     sortBy[prop] = (isDesc) ? -1 : 1
-
-    // Shorter Syntax:
-    // const sortBy = {
-    //     [prop] : (isDesc)? -1 : 1
-    // }
-
     locService.setSortBy(sortBy)
     loadAndRenderLocs()
 }
@@ -284,11 +299,8 @@ function renderLocStats() {
 }
 
 function handleStats(stats, selector) {
-    // stats = { low: 37, medium: 11, high: 100, total: 148 }
-    // stats = { low: 5, medium: 5, high: 5, baba: 55, mama: 30, total: 100 }
     const labels = cleanStats(stats)
     const colors = utilService.getColors()
-
     var sumPercent = 0
     var colorsStr = `${colors[0]} ${0}%, `
     labels.forEach((label, idx) => {
@@ -301,15 +313,10 @@ function handleStats(stats, selector) {
             colorsStr += `${colors[idx + 1]} ${sumPercent}%, `
         }
     })
-
     colorsStr += `${colors[labels.length - 1]} ${100}%`
-    // Example:
-    // colorsStr = `purple 0%, purple 33%, blue 33%, blue 67%, red 67%, red 100%`
-
     const elPie = document.querySelector(`.${selector} .pie`)
     const style = `background-image: conic-gradient(${colorsStr})`
     elPie.style = style
-
     const ledendHTML = labels.map((label, idx) => {
         return `
                 <li>
@@ -318,7 +325,6 @@ function handleStats(stats, selector) {
                 </li>
             `
     }).join('')
-
     const elLegend = document.querySelector(`.${selector} .legend`)
     elLegend.innerHTML = ledendHTML
 }
